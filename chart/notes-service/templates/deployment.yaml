@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notes-service
+  labels:
+    {{- include "notes-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "notes-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "notes-service.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecretName }}
+      containers:
+        - name: notes-service
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            # Env vars override application.yml via Spring relaxed binding: no code change needed.
+            - name: SPRING_PROFILES_ACTIVE
+              value: remote
+            # No Config Server on the remote leg (recorded limitation); skip the lookup entirely.
+            - name: SPRING_CLOUD_CONFIG_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_VAULT_AUTHENTICATION
+              value: KUBERNETES
+            - name: SPRING_CLOUD_VAULT_KUBERNETES_ROLE
+              value: {{ .Values.vault.role | quote }}
+            - name: VAULT_HOST
+              value: {{ .Values.vault.host | quote }}
+            - name: DB_URL
+              value: "jdbc:postgresql://notes-postgres:5432/{{ .Values.postgres.database }}"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          # JVM + Flyway + Vault login can take a while on a shared box; don't let liveness kill it early.
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 36
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 5

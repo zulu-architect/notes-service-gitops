@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: notes-service
+  # Application objects live in Argo CD's own namespace, not the target namespace
+  namespace: argocd
+spec:
+  project: default
+  source:
+    # Public repo: nothing secret lives in it, so Argo CD needs no repo credentials
+    repoURL: https://github.com/zulu-architect/notes-service-gitops.git
+    targetRevision: main
+    path: chart/notes-service
+    helm:
+      # Chart's own values.yaml is picked up automatically; list overrides here if added later
+      valueFiles:
+        - values.yaml
+  destination:
+    # "this cluster": the one Argo CD itself runs in
+    server: https://kubernetes.default.svc
+    namespace: notes
+  syncPolicy:
+    automated:
+      # Delete cluster objects that were removed from Git
+      prune: true
+      # Revert manual cluster edits back to Git (why Rancher is observe-only)
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

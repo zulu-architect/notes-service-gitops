@@ -1,0 +1,8 @@
+apiVersion: v2
+name: notes-service
+description: Notes CRUD service (Spring Boot) with in-cluster Postgres
+type: application
+# version = the chart's own version; bump when templates change.
+version: 0.1.0
+# appVersion = informational only. The image actually deployed is values.yaml image.tag.
+appVersion: "0.0.1"

@@ -1,0 +1,22 @@
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: notes-service
+  labels:
+    {{- include "notes-service.labels" . | nindent 4 }}
+spec:
+  # k3s bundles Traefik, which serves port 80 on the node
+  ingressClassName: traefik
+  rules:
+    - host: {{ .Values.ingress.host | quote }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: notes-service
+                port:
+                  name: http
+{{- end }}
