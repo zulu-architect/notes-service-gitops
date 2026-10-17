@@ -28,7 +28,7 @@ service:
 ingress:
   enabled: true
   # sslip.io resolves to the IP in the name; update when the EC2 public IP changes
-  host: notes.13.245.143.42.sslip.io
+  host: notes.REPLACE_WITH_PUBLIC_IP.sslip.io
 
 vault:
   # Spring Cloud Vault: KUBERNETES auth against the in-cluster dev-mode Vault
