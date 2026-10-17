@@ -1,8 +1,9 @@
 image:
   # Full ECR URL without a tag: `terraform output ecr_repository_url`
-  repository: REPLACE_WITH_ECR_REPOSITORY_URL
+  repository: 422653420415.dkr.ecr.af-south-1.amazonaws.com/notes-service
   # The one line CI rewrites in Phase 9. Commit SHA, never "latest" (ECR tags are IMMUTABLE).
-  tag: "REPLACE_WITH_FIRST_IMAGE_TAG"
+  # 0.0.1 is the manually pushed bootstrap image; Phase 8's pipeline switches to SHA tags.
+  tag: "0.0.1"
   pullPolicy: IfNotPresent
   # Created by hand on the cluster, never in Git (ECR token expires after 12h)
   pullSecretName: ecr-pull
@@ -27,7 +28,7 @@ service:
 ingress:
   enabled: true
   # sslip.io resolves to the IP in the name; update when the EC2 public IP changes
-  host: notes.REPLACE_WITH_PUBLIC_IP.sslip.io
+  host: notes.13.245.143.42.sslip.io
 
 vault:
   # Spring Cloud Vault: KUBERNETES auth against the in-cluster dev-mode Vault
