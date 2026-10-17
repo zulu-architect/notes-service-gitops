@@ -3,7 +3,7 @@ image:
   repository: 422653420415.dkr.ecr.af-south-1.amazonaws.com/notes-service
   # The one line CI rewrites in Phase 9. Commit SHA, never "latest" (ECR tags are IMMUTABLE).
   # 0.0.1 is the manually pushed bootstrap image; Phase 8's pipeline switches to SHA tags.
-  tag: "0.0.1"
+  tag: "ea7b7d0"
   pullPolicy: IfNotPresent
   # Created by hand on the cluster, never in Git (ECR token expires after 12h)
   pullSecretName: ecr-pull
